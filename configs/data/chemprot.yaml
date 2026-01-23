@@ -1,0 +1,26 @@
+# ChemProt dataset configuration
+dataset:
+  name: "chemprot"
+  # Path to data directory (containing train/dev/test splits)
+  # Users should download ChemProt and place it here, or set via command line
+  data_dir: "data/chemprot"
+  # Hugging Face dataset (alternative)
+  hf_dataset: null  # "bigbio/chemprot" if available
+  # Label configuration
+  labels_file: "data/labels/chemprot.json"
+  # Entity markers
+  entity_markers:
+    e1_start: "<e1>"
+    e1_end: "</e1>"
+    e2_start: "<e2>"
+    e2_end: "</e2>"
+  # Task description for prompt
+  task_description: "Classify the chemical-protein interaction relation between the marked entities."
+  # Label set (will be loaded from labels_file)
+  # ChemProt relation types:
+  # CPR:3 - Upregulator/Activator
+  # CPR:4 - Downregulator/Inhibitor
+  # CPR:5 - Agonist
+  # CPR:6 - Antagonist
+  # CPR:9 - Substrate/Product
+  # false - No relation

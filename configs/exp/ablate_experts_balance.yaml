@@ -1,0 +1,87 @@
+# Ablation: Expert Numbers and Balance Loss
+# Studies effect of number of experts and balance loss coefficient
+
+experiment:
+  name: "ablate_experts_balance"
+  description: "Expert number and balance loss ablation study"
+
+# Sweep over expert counts
+sweep:
+  parameter: "num_experts"
+  values:
+    # N = 2 experts per layer (uniform)
+    - name: "n_experts_2"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 2
+        n_experts_high: 2
+        balance_loss_coef: 0.01
+
+    # N = 4 experts per layer (uniform)
+    - name: "n_experts_4"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 4
+        n_experts_mid: 4
+        n_experts_high: 4
+        balance_loss_coef: 0.01
+
+    # N = 8 experts per layer (uniform)
+    - name: "n_experts_8"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 8
+        n_experts_mid: 8
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+    # N = 16 experts per layer (uniform)
+    - name: "n_experts_16"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 16
+        n_experts_mid: 16
+        n_experts_high: 16
+        balance_loss_coef: 0.01
+
+    # N = 8 without balance loss
+    - name: "n_experts_8_no_balance"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 8
+        n_experts_mid: 8
+        n_experts_high: 8
+        balance_loss_coef: 0.0  # No balance loss
+
+training:
+  do_train: true
+  do_eval: true
+
+output:
+  subdir: "ablate_experts_balance"

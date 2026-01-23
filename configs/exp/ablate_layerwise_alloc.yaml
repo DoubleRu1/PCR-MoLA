@@ -1,0 +1,92 @@
+# Ablation: Layer-wise Expert Allocation
+# Compares different strategies for distributing experts across layers
+# All configurations aim to match total expert parameters
+
+experiment:
+  name: "ablate_layerwise_alloc"
+  description: "Layer-wise expert allocation ablation study"
+
+# Sweep over allocation strategies
+sweep:
+  parameter: "allocation"
+  values:
+    # Uniform allocation: same number of experts per layer
+    # For 32-layer model: ~4.67 experts/layer to match Ours total
+    - name: "uniform"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 5
+        n_experts_mid: 5
+        n_experts_high: 5
+        balance_loss_coef: 0.01
+
+    # Reverse allocation: low layers have more experts
+    # Opposite of our hypothesis
+    - name: "reverse"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 8
+        n_experts_mid: 4
+        n_experts_high: 2
+        balance_loss_coef: 0.01
+
+    # High-only: experts only in high layers
+    # All parameters concentrated at top
+    - name: "high_only"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 1
+        n_experts_mid: 1
+        n_experts_high: 12
+        balance_loss_coef: 0.01
+
+    # Low-only: experts only in low layers
+    # All parameters concentrated at bottom
+    - name: "low_only"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 12
+        n_experts_mid: 1
+        n_experts_high: 1
+        balance_loss_coef: 0.01
+
+    # Ours: Progressive allocation (low -> mid -> high)
+    - name: "progressive"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+training:
+  do_train: true
+  do_eval: true
+
+output:
+  subdir: "ablate_layerwise_alloc"

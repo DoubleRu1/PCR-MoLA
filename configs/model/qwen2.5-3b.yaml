@@ -1,0 +1,47 @@
+# Qwen2.5-3B model configuration
+model:
+  name: "qwen2.5-3b"
+  # Hugging Face model ID
+  pretrained_model_name_or_path: "Qwen/Qwen2.5-3B"
+  # Alternative local path (uncomment and modify if needed)
+  # pretrained_model_name_or_path: "/path/to/local/qwen2.5-3b"
+
+  # Model architecture info (used for injection)
+  architecture: "qwen2"
+  hidden_size: 2048
+  num_hidden_layers: 36
+  num_attention_heads: 16
+  intermediate_size: 11008
+
+  # FFN/MLP module pattern for PCR-MoLA injection
+  # Qwen2 uses "mlp" as the FFN module name
+  ffn_module_pattern: "mlp"
+  # The FFN output projection (where we add our delta)
+  ffn_output_proj: "down_proj"
+
+  # Attention projection names for LoRA
+  attention_projections:
+    q_proj: "q_proj"
+    k_proj: "k_proj"
+    v_proj: "v_proj"
+    o_proj: "o_proj"
+
+  # Tokenizer settings
+  tokenizer:
+    use_fast: true
+    padding_side: "left"
+    truncation_side: "right"
+    # Qwen2.5 uses <|endoftext|> as eos
+    # pad_token will be set to eos_token if not specified
+
+  # Generation settings
+  generation:
+    # Qwen2.5 eos token id
+    eos_token_id: 151643
+    pad_token_id: 151643
+
+  # Load settings
+  load:
+    torch_dtype: "bfloat16"
+    device_map: "auto"
+    trust_remote_code: true

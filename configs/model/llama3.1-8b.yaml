@@ -1,0 +1,44 @@
+# Llama-3.1-8B model configuration
+model:
+  name: "llama3.1-8b"
+  pretrained_model_name_or_path: "meta-llama/Llama-3.1-8B"
+  # Alternative: use instruction-tuned version
+  # pretrained_model_name_or_path: "meta-llama/Llama-3.1-8B-Instruct"
+
+  # Model architecture info
+  architecture: "llama"
+  hidden_size: 4096
+  num_hidden_layers: 32
+  num_attention_heads: 32
+  intermediate_size: 14336
+
+  # FFN/MLP module pattern
+  # Llama uses "mlp" with gate_proj, up_proj, down_proj
+  ffn_module_pattern: "mlp"
+  ffn_output_proj: "down_proj"
+
+  # Attention projections
+  attention_projections:
+    q_proj: "q_proj"
+    k_proj: "k_proj"
+    v_proj: "v_proj"
+    o_proj: "o_proj"
+
+  # Tokenizer
+  tokenizer:
+    use_fast: true
+    padding_side: "left"
+    truncation_side: "right"
+    # Llama may need explicit pad token
+    add_pad_token: true
+
+  # Generation
+  generation:
+    eos_token_id: 128001
+    pad_token_id: 128001
+
+  # Load
+  load:
+    torch_dtype: "bfloat16"
+    device_map: "auto"
+    trust_remote_code: false

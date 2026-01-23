@@ -1,0 +1,54 @@
+{
+  "name": "DDI",
+  "description": "Drug-Drug Interaction Relations",
+  "labels": {
+    "0": {
+      "id": 0,
+      "name": "false",
+      "text": "no_interaction",
+      "description": "No drug-drug interaction"
+    },
+    "1": {
+      "id": 1,
+      "name": "mechanism",
+      "text": "mechanism",
+      "description": "Pharmacokinetic mechanism interaction"
+    },
+    "2": {
+      "id": 2,
+      "name": "effect",
+      "text": "effect",
+      "description": "Pharmacodynamic effect interaction"
+    },
+    "3": {
+      "id": 3,
+      "name": "advise",
+      "text": "advise",
+      "description": "Recommendation or advice about interaction"
+    },
+    "4": {
+      "id": 4,
+      "name": "int",
+      "text": "interaction",
+      "description": "General unspecified interaction"
+    }
+  },
+  "label_to_id": {
+    "no_interaction": 0,
+    "false": 0,
+    "mechanism": 1,
+    "effect": 2,
+    "advise": 3,
+    "interaction": 4,
+    "int": 4
+  },
+  "id_to_label": {
+    "0": "no_interaction",
+    "1": "mechanism",
+    "2": "effect",
+    "3": "advise",
+    "4": "interaction"
+  },
+  "num_labels": 5,
+  "label_list": ["no_interaction", "mechanism", "effect", "advise", "interaction"]
+}

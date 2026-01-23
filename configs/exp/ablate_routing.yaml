@@ -1,0 +1,65 @@
+# Ablation: Routing Condition
+# Compares different routing strategies
+
+experiment:
+  name: "ablate_routing"
+  description: "Routing condition ablation study"
+
+# Sweep over routing variants
+sweep:
+  parameter: "routing_type"
+  values:
+    # Static LoRA (no routing, baseline reference)
+    - name: "static_lora"
+      method: "lora"
+      lora:
+        rank: 8
+        alpha: 32
+
+    # Sentence-conditioned routing (uses sentence representation, not entity pair)
+    - name: "sentence_conditioned"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "context_only"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+
+    # No routing (uniform expert weights)
+    - name: "no_routing"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 8  # Use all experts with equal weight
+        n_experts_low: 8
+        n_experts_mid: 8
+        n_experts_high: 8
+        balance_loss_coef: 0.0  # No balance loss needed
+
+    # Ours: Entity pair-conditioned routing
+    - name: "entity_pair_conditioned"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+training:
+  do_train: true
+  do_eval: true
+
+output:
+  subdir: "ablate_routing"

@@ -1,0 +1,66 @@
+{
+  "name": "ChemProt",
+  "description": "Chemical-Protein Interaction Relations",
+  "labels": {
+    "0": {
+      "id": 0,
+      "name": "false",
+      "text": "no_relation",
+      "description": "No chemical-protein relation"
+    },
+    "1": {
+      "id": 1,
+      "name": "CPR:3",
+      "text": "upregulator",
+      "description": "Upregulator/Activator - chemical activates or increases expression/activity"
+    },
+    "2": {
+      "id": 2,
+      "name": "CPR:4",
+      "text": "downregulator",
+      "description": "Downregulator/Inhibitor - chemical inhibits or decreases expression/activity"
+    },
+    "3": {
+      "id": 3,
+      "name": "CPR:5",
+      "text": "agonist",
+      "description": "Agonist - chemical binds and activates receptor"
+    },
+    "4": {
+      "id": 4,
+      "name": "CPR:6",
+      "text": "antagonist",
+      "description": "Antagonist - chemical binds and blocks receptor"
+    },
+    "5": {
+      "id": 5,
+      "name": "CPR:9",
+      "text": "substrate",
+      "description": "Substrate/Product - chemical is substrate or product of protein"
+    }
+  },
+  "label_to_id": {
+    "no_relation": 0,
+    "false": 0,
+    "upregulator": 1,
+    "CPR:3": 1,
+    "downregulator": 2,
+    "CPR:4": 2,
+    "agonist": 3,
+    "CPR:5": 3,
+    "antagonist": 4,
+    "CPR:6": 4,
+    "substrate": 5,
+    "CPR:9": 5
+  },
+  "id_to_label": {
+    "0": "no_relation",
+    "1": "upregulator",
+    "2": "downregulator",
+    "3": "agonist",
+    "4": "antagonist",
+    "5": "substrate"
+  },
+  "num_labels": 6,
+  "label_list": ["no_relation", "upregulator", "downregulator", "agonist", "antagonist", "substrate"]
+}

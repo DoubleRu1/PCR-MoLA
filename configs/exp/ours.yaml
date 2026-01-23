@@ -1,0 +1,42 @@
+# Ours: PCR-MoLA
+# Entity Pair-Conditioned Routing with Layer-wise Adaptive Expert Allocation
+
+experiment:
+  name: "pcr_mola"
+  method: "pcr_mola"
+  description: "PCR-MoLA with entity pair-conditioned routing and layer-wise adaptive allocation"
+
+# PCR-MoLA configuration
+pcr_mola:
+  # Router projection dimension
+  router_dim: 256
+  # LoRA rank for each expert
+  rank: 8
+  # Alpha scale
+  alpha_scale: 32
+  # Top-K routing
+  top_k: 2
+  # Balance loss coefficient
+  balance_loss_coef: 0.01
+  # Layer-wise expert allocation
+  # Layers [0, L/3): n_experts_low
+  # Layers [L/3, 2L/3): n_experts_mid
+  # Layers [2L/3, L): n_experts_high
+  n_experts_low: 2
+  n_experts_mid: 4
+  n_experts_high: 8
+  # Pair feature mode: "full", "no_diff", "no_interaction", "context_only"
+  pair_features: "full"
+  # Router dropout
+  router_dropout: 0.1
+  # Injection target: FFN output
+  injection_target: "ffn"
+
+# Training
+training:
+  do_train: true
+  do_eval: true
+
+# Output
+output:
+  subdir: "pcr_mola"

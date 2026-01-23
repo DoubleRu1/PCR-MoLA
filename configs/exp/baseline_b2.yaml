@@ -1,0 +1,27 @@
+# B2: LLM + Standard LoRA baseline
+# Static LoRA adaptation on attention projections
+
+experiment:
+  name: "baseline_b2_lora"
+  method: "lora"
+  description: "Standard LoRA fine-tuning on attention projections"
+
+# LoRA configuration
+lora:
+  rank: 8
+  alpha: 32
+  dropout: 0.1
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Training (uses defaults from default.yaml)
+training:
+  do_train: true
+  do_eval: true
+
+# Output
+output:
+  subdir: "b2_lora"

@@ -1,0 +1,30 @@
+# B3: LoRAMoE baseline
+# Token-conditioned routing with multiple LoRA experts
+
+experiment:
+  name: "baseline_b3_loramoe"
+  method: "loramoe"
+  description: "LoRAMoE with token-conditioned routing"
+
+# LoRAMoE configuration
+loramoe:
+  rank: 8
+  alpha: 32
+  dropout: 0.1
+  num_experts: 4
+  top_k: 2
+  balance_loss_coef: 0.01
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+  # Token-conditioned routing: each token routes independently
+  routing_type: "token"
+
+# Training
+training:
+  do_train: true
+  do_eval: true
+
+# Output
+output:
+  subdir: "b3_loramoe"

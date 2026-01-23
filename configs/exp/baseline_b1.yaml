@@ -1,0 +1,23 @@
+# B1: LLM + In-Context Learning (ICL) baseline
+# No training required - uses few-shot prompting
+
+experiment:
+  name: "baseline_b1_icl"
+  method: "icl"
+  description: "In-context learning with few-shot exemplars"
+
+# ICL specific settings
+icl:
+  num_exemplars: 5
+  exemplar_selection: "stratified"  # "random" or "stratified"
+  use_cot: false  # Chain-of-thought reasoning
+  exemplar_seed: 42  # Fixed seed for exemplar selection
+
+# No training for ICL
+training:
+  do_train: false
+  do_eval: true
+
+# Output
+output:
+  subdir: "b1_icl"

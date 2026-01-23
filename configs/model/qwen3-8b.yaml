@@ -1,0 +1,39 @@
+# Qwen3-8B model configuration
+model:
+  name: "qwen3-8b"
+  pretrained_model_name_or_path: "Qwen/Qwen3-8B"
+
+  # Model architecture info
+  architecture: "qwen2"  # Qwen3 uses similar architecture
+  hidden_size: 4096
+  num_hidden_layers: 32
+  num_attention_heads: 32
+  intermediate_size: 14336
+
+  # FFN/MLP module pattern
+  ffn_module_pattern: "mlp"
+  ffn_output_proj: "down_proj"
+
+  # Attention projections
+  attention_projections:
+    q_proj: "q_proj"
+    k_proj: "k_proj"
+    v_proj: "v_proj"
+    o_proj: "o_proj"
+
+  # Tokenizer
+  tokenizer:
+    use_fast: true
+    padding_side: "left"
+    truncation_side: "right"
+
+  # Generation
+  generation:
+    eos_token_id: 151645
+    pad_token_id: 151645
+
+  # Load
+  load:
+    torch_dtype: "bfloat16"
+    device_map: "auto"
+    trust_remote_code: true

@@ -1,0 +1,21 @@
+# GAD (Gene-Disease Association) dataset configuration
+dataset:
+  name: "gad"
+  # Path to data directory
+  data_dir: "data/gad"
+  # Hugging Face dataset (alternative)
+  hf_dataset: null
+  # Label configuration
+  labels_file: "data/labels/gad.json"
+  # Entity markers
+  entity_markers:
+    e1_start: "<e1>"
+    e1_end: "</e1>"
+    e2_start: "<e2>"
+    e2_end: "</e2>"
+  # Task description for prompt
+  task_description: "Classify whether there is a gene-disease association between the marked entities."
+  # Label set (will be loaded from labels_file)
+  # GAD relation types:
+  # associated - Gene is associated with disease
+  # not_associated - No association

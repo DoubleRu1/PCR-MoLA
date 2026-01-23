@@ -1,0 +1,39 @@
+# Qwen2.5-7B model configuration
+model:
+  name: "qwen2.5-7b"
+  pretrained_model_name_or_path: "Qwen/Qwen2.5-7B"
+
+  # Model architecture info
+  architecture: "qwen2"
+  hidden_size: 3584
+  num_hidden_layers: 28
+  num_attention_heads: 28
+  intermediate_size: 18944
+
+  # FFN/MLP module pattern
+  ffn_module_pattern: "mlp"
+  ffn_output_proj: "down_proj"
+
+  # Attention projections
+  attention_projections:
+    q_proj: "q_proj"
+    k_proj: "k_proj"
+    v_proj: "v_proj"
+    o_proj: "o_proj"
+
+  # Tokenizer
+  tokenizer:
+    use_fast: true
+    padding_side: "left"
+    truncation_side: "right"
+
+  # Generation
+  generation:
+    eos_token_id: 151643
+    pad_token_id: 151643
+
+  # Load
+  load:
+    torch_dtype: "bfloat16"
+    device_map: "auto"
+    trust_remote_code: true

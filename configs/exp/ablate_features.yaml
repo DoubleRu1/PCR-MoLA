@@ -1,0 +1,73 @@
+# Ablation: Entity Pair Features
+# Compares different feature combinations for pair representation
+
+experiment:
+  name: "ablate_features"
+  description: "Entity pair feature ablation study"
+
+# Sweep over feature variants
+sweep:
+  parameter: "pair_features"
+  values:
+    # Context only: uses last token hidden state
+    - name: "context_only"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "context_only"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+    # Without difference feature (h1 - h2)
+    - name: "no_difference"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "no_diff"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+    # Without interaction feature (h1 * h2)
+    - name: "no_interaction"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "no_interaction"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+    # Full features: [h1; h2; h1*h2; h1-h2]
+    - name: "full_features"
+      method: "pcr_mola"
+      pcr_mola:
+        pair_features: "full"
+        router_dim: 256
+        rank: 8
+        alpha_scale: 32
+        top_k: 2
+        n_experts_low: 2
+        n_experts_mid: 4
+        n_experts_high: 8
+        balance_loss_coef: 0.01
+
+training:
+  do_train: true
+  do_eval: true
+
+output:
+  subdir: "ablate_features"
