@@ -66,6 +66,18 @@ def parse_args():
         action="store_true",
         help="Skip training, only generate tables from existing results",
     )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=3,
+        help="Number of training epochs",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=8,
+        help="Training batch size",
+    )
 
     return parser.parse_args()
 
@@ -89,6 +101,8 @@ def run_experiment(
     variant_name: str,
     use_synthetic: bool = False,
     dry_run: bool = False,
+    epochs: int = 3,
+    batch_size: int = 8,
 ) -> Optional[str]:
     """
     Run a single experiment.
@@ -108,6 +122,8 @@ def run_experiment(
         "--model_config", model_config_path,
         "--data_config", data_config_path,
         "--output_dir", str(run_output_dir),
+        "--epochs", str(epochs),
+        "--batch_size", str(batch_size),
     ]
 
     if use_synthetic:
@@ -298,6 +314,8 @@ def main():
                         variant_name=variant_name,
                         use_synthetic=args.use_synthetic,
                         dry_run=args.dry_run,
+                        epochs=args.epochs,
+                        batch_size=args.batch_size,
                     )
 
     # Generate tables

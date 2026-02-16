@@ -1,66 +1,47 @@
 {
-  "name": "ChemProt",
-  "description": "Chemical-Protein Interaction Relations",
-  "labels": {
-    "0": {
-      "id": 0,
-      "name": "false",
-      "text": "no_relation",
-      "description": "No chemical-protein relation"
-    },
-    "1": {
-      "id": 1,
-      "name": "CPR:3",
-      "text": "upregulator",
-      "description": "Upregulator/Activator - chemical activates or increases expression/activity"
-    },
-    "2": {
-      "id": 2,
-      "name": "CPR:4",
-      "text": "downregulator",
-      "description": "Downregulator/Inhibitor - chemical inhibits or decreases expression/activity"
-    },
-    "3": {
-      "id": 3,
-      "name": "CPR:5",
-      "text": "agonist",
-      "description": "Agonist - chemical binds and activates receptor"
-    },
-    "4": {
-      "id": 4,
-      "name": "CPR:6",
-      "text": "antagonist",
-      "description": "Antagonist - chemical binds and blocks receptor"
-    },
-    "5": {
-      "id": 5,
-      "name": "CPR:9",
-      "text": "substrate",
-      "description": "Substrate/Product - chemical is substrate or product of protein"
-    }
-  },
+  "label_list": [
+    "ACTIVATOR",
+    "AGONIST",
+    "AGONIST-ACTIVATOR",
+    "AGONIST-INHIBITOR",
+    "ANTAGONIST",
+    "DOWNREGULATOR",
+    "INDIRECT-DOWNREGULATOR",
+    "INDIRECT-UPREGULATOR",
+    "INHIBITOR",
+    "PRODUCT-OF",
+    "SUBSTRATE",
+    "SUBSTRATE_PRODUCT-OF",
+    "UPREGULATOR"
+  ],
   "label_to_id": {
-    "no_relation": 0,
-    "false": 0,
-    "upregulator": 1,
-    "CPR:3": 1,
-    "downregulator": 2,
-    "CPR:4": 2,
-    "agonist": 3,
-    "CPR:5": 3,
-    "antagonist": 4,
-    "CPR:6": 4,
-    "substrate": 5,
-    "CPR:9": 5
+    "ACTIVATOR": 0,
+    "AGONIST": 1,
+    "AGONIST-ACTIVATOR": 2,
+    "AGONIST-INHIBITOR": 3,
+    "ANTAGONIST": 4,
+    "DOWNREGULATOR": 5,
+    "INDIRECT-DOWNREGULATOR": 6,
+    "INDIRECT-UPREGULATOR": 7,
+    "INHIBITOR": 8,
+    "PRODUCT-OF": 9,
+    "SUBSTRATE": 10,
+    "SUBSTRATE_PRODUCT-OF": 11,
+    "UPREGULATOR": 12
   },
   "id_to_label": {
-    "0": "no_relation",
-    "1": "upregulator",
-    "2": "downregulator",
-    "3": "agonist",
-    "4": "antagonist",
-    "5": "substrate"
-  },
-  "num_labels": 6,
-  "label_list": ["no_relation", "upregulator", "downregulator", "agonist", "antagonist", "substrate"]
+    "0": "ACTIVATOR",
+    "1": "AGONIST",
+    "2": "AGONIST-ACTIVATOR",
+    "3": "AGONIST-INHIBITOR",
+    "4": "ANTAGONIST",
+    "5": "DOWNREGULATOR",
+    "6": "INDIRECT-DOWNREGULATOR",
+    "7": "INDIRECT-UPREGULATOR",
+    "8": "INHIBITOR",
+    "9": "PRODUCT-OF",
+    "10": "SUBSTRATE",
+    "11": "SUBSTRATE_PRODUCT-OF",
+    "12": "UPREGULATOR"
+  }
 }

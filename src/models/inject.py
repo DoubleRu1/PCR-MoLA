@@ -264,7 +264,13 @@ def find_ffn_modules(
         match = re.match(pattern, name)
         if match:
             layer_idx = int(match.group(1))
-            ffn_modules[layer_idx] = (name, module)
+            # Only match the exact module (not sub-modules like .gate_proj, .act_fn, etc.)
+            # Check that the match is at the end of the name or followed by a dot
+            remaining = name[match.end():]
+            if remaining == '' or remaining.startswith('.'):
+                # This is the main FFN module, not a sub-module
+                if layer_idx not in ffn_modules:
+                    ffn_modules[layer_idx] = (name, module)
 
     return ffn_modules
 

@@ -117,11 +117,10 @@ def preprocess_chemprot(
     """
     Preprocess ChemProt dataset.
 
-    Expected data format (TSV or JSON):
-    - sentence: text
-    - e1_start, e1_end: entity 1 character offsets
-    - e2_start, e2_end: entity 2 character offsets
+    Expected data format (JSONL):
+    - text: text with entities marked as <<entity1>> and [[entity2]]
     - label: relation label
+    - metadata: additional data (unused)
 
     Returns:
         List of preprocessed examples
@@ -159,34 +158,57 @@ def preprocess_chemprot(
                 values = line.strip().split("\t")
                 raw_data.append(dict(zip(header, values)))
 
-    for item in raw_data:
+    for idx, item in enumerate(raw_data):
         # Extract fields (handle different naming conventions)
-        sentence = item.get("sentence", item.get("text", ""))
-        e1_start = int(item.get("e1_start", item.get("entity1_start", 0)))
-        e1_end = int(item.get("e1_end", item.get("entity1_end", 0)))
-        e2_start = int(item.get("e2_start", item.get("entity2_start", 0)))
-        e2_end = int(item.get("e2_end", item.get("entity2_end", 0)))
-        label = item.get("label", item.get("relation", "false"))
+        text = item.get("text", item.get("sentence", ""))
+        label = item.get("label", item.get("relation", ""))
 
-        # Insert entity markers
-        marked_sentence = insert_entity_markers(
-            sentence, e1_start, e1_end, e2_start, e2_end,
-            entity_markers["e1_start"], entity_markers["e1_end"],
-            entity_markers["e2_start"], entity_markers["e2_end"],
-        )
+        # New format uses <<entity1>> and [[entity2]] markers
+        # Convert to standard <e1></e1> and <e2></e2> markers
+        import re
 
-        # Map label to text
+        # Pattern for <<entity1>> and [[entity2]] markers
+        e1_pattern = re.compile(r'<<([^>>]+)>>')
+        e2_pattern = re.compile(r'\[\[([^\]]+)\]\]')
+
+        e1_match = e1_pattern.search(text)
+        e2_match = e2_pattern.search(text)
+
+        if e1_match and e2_match:
+            e1_text = e1_match.group(1)
+            e2_text = e2_match.group(1)
+
+            # Replace <<e1>> with <e1> and [[e2]] with <e2>
+            marked_sentence = e1_pattern.sub(entity_markers["e1_start"] + r'\1' + entity_markers["e1_end"], text, count=1)
+            marked_sentence = e2_pattern.sub(entity_markers["e2_start"] + r'\1' + entity_markers["e2_end"], marked_sentence, count=1)
+
+            # Extract entity positions for backward compatibility
+            e1_start = text.find("<<" + e1_text + ">>")
+            e1_end = e1_start + len(e1_text)
+            e2_start = text.find("[[" + e2_text + "]]")
+            e2_end = e2_start + len(e2_text)
+        else:
+            # Fallback: use original text as sentence (no entity markers)
+            marked_sentence = text
+            e1_text = ""
+            e2_text = ""
+            e1_start = 0
+            e1_end = 0
+            e2_start = 0
+            e2_end = 0
+
+        # Map label to id
         label_id = label_config["label_to_id"].get(str(label), 0)
-        label_text = label_config["id_to_label"][str(label_id)]
+        label_text = label_config["id_to_label"].get(str(label_id), label)
 
         examples.append({
-            "id": item.get("id", len(examples)),
+            "id": item.get("id", idx),
             "sentence": marked_sentence,
             "label": label_text,
             "label_id": label_id,
-            "original_sentence": sentence,
-            "e1_text": sentence[e1_start:e1_end],
-            "e2_text": sentence[e2_start:e2_end],
+            "original_sentence": text,
+            "e1_text": e1_text,
+            "e2_text": e2_text,
         })
 
     return examples

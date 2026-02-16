@@ -8,6 +8,39 @@ import numpy as np
 import torch
 
 
+def get_available_device() -> str:
+    """
+    Get the best available device (cuda > mps > cpu).
+
+    Returns:
+        Device string: "cuda", "mps", or "cpu"
+    """
+    # Check environment variables first
+    if os.environ.get("CUDA_VISIBLE_DEVICES", "") == "" and os.environ.get("MPS_VISIBLE_DEVICES", "") == "":
+        # Both not set - use default detection
+        if torch.cuda.is_available():
+            return "cuda"
+        elif torch.backends.mps.is_available():
+            return "mps"
+        else:
+            return "cpu"
+    else:
+        # At least one is explicitly set - respect them
+        cuda_visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+        mps_visible = os.environ.get("MPS_VISIBLE_DEVICES", "")
+
+        # Check CUDA first
+        if cuda_visible and cuda_visible != "":
+            if torch.cuda.is_available():
+                return "cuda"
+        elif mps_visible and mps_visible != "":
+            if torch.backends.mps.is_available():
+                return "mps"
+
+        # Fallback to CPU if explicitly disabled
+        return "cpu"
+
+
 def set_seed(seed: int = 42, deterministic: bool = True) -> None:
     """
     Set random seed for reproducibility.
@@ -33,6 +66,10 @@ def set_seed(seed: int = 42, deterministic: bool = True) -> None:
                 torch.use_deterministic_algorithms(True)
             except Exception:
                 pass  # Some operations may not have deterministic implementations
+
+    # MPS also supports manual seed
+    if torch.backends.mps.is_available():
+        torch.mps.manual_seed(seed)
 
     os.environ["PYTHONHASHSEED"] = str(seed)
 

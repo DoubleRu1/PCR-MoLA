@@ -38,6 +38,7 @@ from .models import (
 from .models.pcr_mola import PCRMoLAConfig
 from .utils import (
     set_seed,
+    get_available_device,
     setup_logger,
     log_config,
     log_trainable_params,
@@ -91,10 +92,23 @@ def load_backbone(
     model_path = model_config["model"]["pretrained_model_name_or_path"]
     load_config = model_config["model"].get("load", {})
 
-    # Determine dtype
+    # Get available device
+    device = get_available_device()
+
+    # Disable gradient checkpointing for non-CUDA (MPS has issues)
+    if device != "cuda" and use_gradient_checkpointing:
+        use_gradient_checkpointing = False
+
+    # Determine dtype based on device
+    # For MPS, use float32 to avoid datatype mismatch issues
+    # For CPU, use float32
+    # For CUDA with bf16, use bfloat16
     dtype_str = load_config.get("torch_dtype", "bfloat16")
-    if dtype_str == "bfloat16":
+    if device == "cuda" and dtype_str == "bfloat16":
         dtype = torch.bfloat16
+    elif device == "mps":
+        # MPS has issues with mixed dtypes, use float32
+        dtype = torch.float32
     elif dtype_str == "float16":
         dtype = torch.float16
     else:
@@ -116,11 +130,23 @@ def load_backbone(
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
+    # Determine device_map based on available device
+    if device == "mps":
+        # MPS doesn't support device_map="auto" well, use "mps" explicitly
+        device_map = "mps"
+        # MPS doesn't support bfloat16, use float16 or float32
+        if dtype == torch.bfloat16:
+            dtype = torch.float16
+    elif device == "cpu":
+        device_map = "cpu"
+    else:
+        device_map = load_config.get("device_map", "auto")
+
     # Load model
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
         torch_dtype=dtype,
-        device_map=load_config.get("device_map", "auto"),
+        device_map=device_map,
         trust_remote_code=load_config.get("trust_remote_code", True),
     )
 
@@ -390,10 +416,31 @@ def main():
         log_file=output_dir / "train.log",
     )
 
+    # Detect available device
+    device = get_available_device()
+    logger.info(f"Using device: {device}")
+
+    # Determine mixed precision based on device
+    # bf16 only works well on CUDA, fp16 works on CUDA but MPS has dtype issues
+    # Use no mixed precision for MPS and CPU for stability
+    if device == "cuda" and config.training.bf16:
+        mixed_precision = "bf16"
+    elif device == "cuda" and config.training.fp16:
+        mixed_precision = "fp16"
+    else:
+        mixed_precision = "no"
+        # Also disable gradient checkpointing for non-CUDA (issues with MPS)
+        if device != "cuda" and config.training.gradient_checkpointing:
+            logger.info("Disabling gradient checkpointing for non-CUDA device")
+            config.training.gradient_checkpointing = False
+
+    logger.info(f"Using mixed precision: {mixed_precision}")
+
     # Setup accelerator
     accelerator = Accelerator(
-        mixed_precision="bf16" if config.training.bf16 else ("fp16" if config.training.fp16 else "no"),
+        mixed_precision=mixed_precision,
         gradient_accumulation_steps=config.training.gradient_accumulation_steps,
+        device_placement=True,
     )
 
     # Set seed
@@ -418,7 +465,7 @@ def main():
     # Load backbone
     logger.info("Loading backbone model...")
     backbone, tokenizer = load_backbone(
-        dict(config.model) if hasattr(config, "model") else {"model": config.model},
+        {"model": OmegaConf.to_container(config.model)} if hasattr(config, "model") else {"model": config.model},
         use_gradient_checkpointing=config.training.gradient_checkpointing,
     )
 

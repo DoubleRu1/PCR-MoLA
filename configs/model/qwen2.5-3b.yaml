@@ -42,6 +42,6 @@ model:
 
   # Load settings
   load:
-    torch_dtype: "bfloat16"
+    torch_dtype: "float32"
     device_map: "auto"
     trust_remote_code: true

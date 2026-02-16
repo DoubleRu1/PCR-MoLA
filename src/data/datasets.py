@@ -167,18 +167,28 @@ class REDataset(Dataset):
         # Create labels for causal LM (mask everything except answer)
         if self.is_train:
             labels = input_ids.clone()
-            # Find "### Answer:" position and mask everything before it
-            answer_marker = "### Answer:"
-            prompt_without_answer = create_prompt(
-                sentence=example["sentence"],
-                label_list=self.label_list,
-                task_description=self.task_description,
-                label_text=None,
-                include_answer=False,
-            )
-            prompt_tokens = self.tokenizer.encode(prompt_without_answer, add_special_tokens=False)
-            # Mask prompt tokens (set to -100)
-            labels[:len(prompt_tokens)] = -100
+            # Find "### Answer:" position in the actual prompt
+            # The prompt has the format: "### Answer:\n{label}"
+            # We need to find the position of "### Answer:" in the tokenized input
+            # and mask everything before it
+            answer_str = "### Answer:"
+            answer_tokens = self.tokenizer.encode(answer_str, add_special_tokens=False)
+
+            # Find where "### Answer:" appears in input_ids
+            input_list = input_ids.tolist()
+            answer_pos = -1
+            for i in range(len(input_list) - len(answer_tokens) + 1):
+                if input_list[i:i+len(answer_tokens)] == answer_tokens:
+                    answer_pos = i
+                    break
+
+            # Mask everything before "### Answer:" (inclusive)
+            if answer_pos >= 0:
+                labels[:answer_pos + len(answer_tokens)] = -100
+            else:
+                # Fallback: mask most of the prompt
+                labels[:100] = -100
+
             # Also mask padding
             labels[attention_mask == 0] = -100
         else:

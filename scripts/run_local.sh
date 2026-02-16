@@ -1,31 +1,27 @@
 #!/bin/bash
-# Run all experiments for PCR-MoLA paper reproduction
-# This script runs all baselines, main comparisons, and ablation studies
+# Local experiment runner for PCR-MoLA
+# Run all experiments on local machine (CPU/MPS)
 
 set -e
-
-# Use virtual environment python
-PYTHON="${HOME}/Code/PCR-MoLA/.venv/bin/python"
 
 # Configuration
 OUTPUT_DIR="${OUTPUT_DIR:-outputs}"
 USE_SYNTHETIC="${USE_SYNTHETIC:-false}"
 SKIP_BASELINES="${SKIP_BASELINES:-false}"
-SKIP_ABLATIONS="${SKIP_ABLATIONS:-false}"
+SKIP_ABLATIONS="${SKIP_ABLATIONS:-true}"
+EPOCHS="${EPOCHS:-3}"
+BATCH_SIZE="${BATCH_SIZE:-1}"
 
 # Model configs
 MODELS=(
     "configs/model/qwen2.5-3b.yaml"
+    # Add more models if needed:
     # "configs/model/qwen2.5-7b.yaml"
-    # "configs/model/qwen3-8b.yaml"
-    # "configs/model/llama3.1-8b.yaml"
 )
 
-# Data configs
+# Data configs (only chemprot available)
 DATASETS=(
     "configs/data/chemprot.yaml"
-    # "configs/data/ddi.yaml"
-    # "configs/data/gad.yaml"
 )
 
 # Synthetic data flag
@@ -36,16 +32,24 @@ if [ "$USE_SYNTHETIC" = "true" ]; then
 fi
 
 echo "=========================================="
-echo "PCR-MoLA Experiment Runner"
+echo "PCR-MoLA Local Experiment Runner"
 echo "=========================================="
 echo "Output directory: $OUTPUT_DIR"
 echo "Models: ${MODELS[@]}"
 echo "Datasets: ${DATASETS[@]}"
+echo "Epochs: $EPOCHS"
+echo "Batch size: $BATCH_SIZE"
 echo "=========================================="
 
 # Create output directories
 mkdir -p "$OUTPUT_DIR/tables"
 mkdir -p "$OUTPUT_DIR/logs"
+
+# Use CPU explicitly
+export CUDA_VISIBLE_DEVICES=""
+export MPS_VISIBLE_DEVICES=""
+
+PYTHON="${HOME}/Code/PCR-MoLA/.venv/bin/python"
 
 # ==========================================
 # Main Comparison Experiments (B1, B2, B3, Ours)
@@ -83,6 +87,8 @@ if [ "$SKIP_BASELINES" != "true" ]; then
                 --model_config "$MODEL" \
                 --data_config "$DATA" \
                 --output_dir "$OUTPUT_DIR/b2_lora_${MODEL_NAME}_${DATA_NAME}" \
+                --epochs $EPOCHS \
+                --batch_size $BATCH_SIZE \
                 $SYNTHETIC_FLAG \
                 2>&1 | tee "$OUTPUT_DIR/logs/b2_lora_${MODEL_NAME}_${DATA_NAME}.log"
 
@@ -94,6 +100,8 @@ if [ "$SKIP_BASELINES" != "true" ]; then
                 --model_config "$MODEL" \
                 --data_config "$DATA" \
                 --output_dir "$OUTPUT_DIR/b3_loramoe_${MODEL_NAME}_${DATA_NAME}" \
+                --epochs $EPOCHS \
+                --batch_size $BATCH_SIZE \
                 $SYNTHETIC_FLAG \
                 2>&1 | tee "$OUTPUT_DIR/logs/b3_loramoe_${MODEL_NAME}_${DATA_NAME}.log"
 
@@ -105,6 +113,8 @@ if [ "$SKIP_BASELINES" != "true" ]; then
                 --model_config "$MODEL" \
                 --data_config "$DATA" \
                 --output_dir "$OUTPUT_DIR/pcr_mola_${MODEL_NAME}_${DATA_NAME}" \
+                --epochs $EPOCHS \
+                --batch_size $BATCH_SIZE \
                 $SYNTHETIC_FLAG \
                 2>&1 | tee "$OUTPUT_DIR/logs/pcr_mola_${MODEL_NAME}_${DATA_NAME}.log"
 
@@ -134,6 +144,8 @@ if [ "$SKIP_ABLATIONS" != "true" ]; then
         --model_configs "$ABLATION_MODEL" \
         --data_configs "${DATASETS[@]}" \
         --output_dir "$OUTPUT_DIR/ablate_routing" \
+        --epochs $EPOCHS \
+        --batch_size $BATCH_SIZE \
         $SYNTHETIC_FLAG \
         2>&1 | tee "$OUTPUT_DIR/logs/ablate_routing.log"
 
@@ -145,6 +157,8 @@ if [ "$SKIP_ABLATIONS" != "true" ]; then
         --model_configs "$ABLATION_MODEL" \
         --data_configs "${DATASETS[@]}" \
         --output_dir "$OUTPUT_DIR/ablate_features" \
+        --epochs $EPOCHS \
+        --batch_size $BATCH_SIZE \
         $SYNTHETIC_FLAG \
         2>&1 | tee "$OUTPUT_DIR/logs/ablate_features.log"
 
@@ -156,6 +170,8 @@ if [ "$SKIP_ABLATIONS" != "true" ]; then
         --model_configs "$ABLATION_MODEL" \
         --data_configs "${DATASETS[@]}" \
         --output_dir "$OUTPUT_DIR/ablate_experts_balance" \
+        --epochs $EPOCHS \
+        --batch_size $BATCH_SIZE \
         $SYNTHETIC_FLAG \
         2>&1 | tee "$OUTPUT_DIR/logs/ablate_experts_balance.log"
 
@@ -167,6 +183,8 @@ if [ "$SKIP_ABLATIONS" != "true" ]; then
         --model_configs "$ABLATION_MODEL" \
         --data_configs "${DATASETS[@]}" \
         --output_dir "$OUTPUT_DIR/ablate_layerwise_alloc" \
+        --epochs $EPOCHS \
+        --batch_size $BATCH_SIZE \
         $SYNTHETIC_FLAG \
         2>&1 | tee "$OUTPUT_DIR/logs/ablate_layerwise_alloc.log"
 fi
